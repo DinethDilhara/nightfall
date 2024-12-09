@@ -23,18 +23,18 @@ struct Sparkle {
 }
 
 impl Sparkle {
-    fn draw(&self) {
-        // each sparkle is pure white
-        let (r, g, b) = (1.0, 1.0, 1.0);
-
-        // simple sine-wave for sparkling
+    fn draw(&self, color: Color) {
+        // Simple sine-wave for sparkling
         let alpha = (self.cycle.sin() + 1.0) / 2.0;
 
-        // draw the circle
-        let color = Color::new(r, g, b, alpha);
+        // Set the color with varying alpha
+        let mut color = color;
+        color.a = alpha;
+
+        // Draw the circle
         draw_circle(self.position.x, self.position.y, self.radius, color);
     }
-}
+}    
 
 fn conf() -> Conf {
     Conf {
@@ -49,6 +49,11 @@ fn conf() -> Conf {
 
 #[macroquad::main(conf)]
 async fn main() {
+
+    // Default speed and color
+    let sparkle_speed = 2.0;
+    let mut sparkle_color = Color::new(1.0, 1.0, 1.0, 1.0); // Start with white
+
     // TODO: seed this with something? the date?
     rand::srand(0);
 
@@ -60,7 +65,7 @@ async fn main() {
         let sparkle = Sparkle {
             position: vec2(x, y),
             radius: rand::gen_range(0.5, 3.0),
-            speed: rand::gen_range(1.5, 3.0),
+            speed: sparkle_speed * rand::gen_range(1.0, 1.5),
             cycle: rand::gen_range(0.0, 90.0),
         };
         sparkles.push(sparkle);
@@ -68,6 +73,17 @@ async fn main() {
 
     loop {
         let delta = get_frame_time();
+
+        // Check for keyboard input to change color
+        if is_key_pressed(KeyCode::R) {
+            sparkle_color = Color::new(1.0, 0.0, 0.0, 1.0); // Red
+        } else if is_key_pressed(KeyCode::G) {
+            sparkle_color = Color::new(0.0, 1.0, 0.0, 1.0); // Green
+        } else if is_key_pressed(KeyCode::B) {
+            sparkle_color = Color::new(0.0, 0.0, 1.0, 1.0); // Blue
+        } else if is_key_pressed(KeyCode::W) {
+            sparkle_color = Color::new(1.0, 1.0, 1.0, 1.0); // White
+        }
 
         // quit if ESC is pressed
         if is_key_pressed(KeyCode::Escape) {
@@ -97,7 +113,7 @@ async fn main() {
         clear_background(BLACK);
 
         for sparkle in sparkles.iter() {
-            sparkle.draw();
+            sparkle.draw(sparkle_color);
         }
 
         next_frame().await
