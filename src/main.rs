@@ -34,7 +34,7 @@ impl Sparkle {
         // Draw the circle
         draw_circle(self.position.x, self.position.y, self.radius, color);
     }
-}    
+}
 
 fn conf() -> Conf {
     Conf {
@@ -49,7 +49,6 @@ fn conf() -> Conf {
 
 #[macroquad::main(conf)]
 async fn main() {
-
     // Default speed and color
     let sparkle_speed = 2.0;
     let mut sparkle_color = Color::new(1.0, 1.0, 1.0, 1.0); // Start with white
